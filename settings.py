@@ -1,0 +1,3 @@
+SERVER_ADDRESS = ('localhost', 8080)
+
+BUFFER_SIZE = 4095
