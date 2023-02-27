@@ -1,6 +1,6 @@
 import socket
 
-server_address = ('localhost', 8080)
+server_address = ('192.168.0.123', 8080)
 with socket.create_server(server_address) as sock:
     while True:
         # ждем соединения
@@ -8,18 +8,33 @@ with socket.create_server(server_address) as sock:
         connect, client_address = sock.accept()
         print('Подключено к:', client_address)
         # Принимаем данные порциями и ретранслируем их
-        while True:
-            data = connect.recv(16)
-            print(f'Получено: {data.decode()}')
-            if data:
-                print('Обработка данных...')
-                temp_data = data.decode('utf-8').upper()
-                data = temp_data.encode('utf-8')
-                print('Данные обработаны, отправка клиенту...')
-                connect.sendall(data)
-            else:
-                print('Нет данных от:', client_address)
-                break
+        connect.setblocking(False)
+        try:
+            while True:
+                data = connect.recv(16)
+                print(f'Получено: {data.decode()}')
+                if data:
+                    print('Обработка данных...')
+                    temp_data = data.decode('utf-8').upper()
+                    data = temp_data.encode('utf-8')
+                    print('Данные обработаны, отправка клиенту...')
+                    connect.sendall(data)
+                else:
+                    print('Нет данных от:', client_address)
+                    break
+        except socket.error:
+            print('Нет данных от:', client_address)
+            connect.close()
+            # print(f'Получено: {data.decode()}')
+            # if data:
+            #     print('Обработка данных...')
+            #     temp_data = data.decode('utf-8').upper()
+            #     data = temp_data.encode('utf-8')
+            #     print('Данные обработаны, отправка клиенту...')
+            #     connect.sendall(data)
+            # else:
+            #     print('Нет данных от:', client_address)
+            #     break
 
 
 # Ожидание соединения...
